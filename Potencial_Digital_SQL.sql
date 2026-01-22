@@ -11,7 +11,6 @@ CREATE TABLE CHARLAS (
     CONSTRAINT chk_puntuacion CHECK (puntuacion_media BETWEEN 1 AND 10)
 );
 
-
 CREATE TABLE USUARIOS (
     idUsuario SMALLINT IDENTITY(1,1) NOT NULL,
     nombre VARCHAR(100) NOT NULL,
@@ -29,13 +28,11 @@ CREATE TABLE ASISTENCIAS (
 
     CONSTRAINT fk_asistencias_charlas FOREIGN KEY (idCharla)
         REFERENCES CHARLAS(idCharla)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
+        ON DELETE CASCADE,
 
     CONSTRAINT fk_asistencias_usuarios FOREIGN KEY (idUsuario)
         REFERENCES USUARIOS(idUsuario)
         ON DELETE CASCADE
-        ON UPDATE CASCADE
 );
 
 CREATE TABLE VOTACIONES (
@@ -46,13 +43,11 @@ CREATE TABLE VOTACIONES (
 
     CONSTRAINT fk_votaciones_charlas FOREIGN KEY (idCharla)
         REFERENCES CHARLAS(idCharla)
-		ON DELETE ACTION
-        ON UPDATE CASCADE,
+        ON DELETE NO ACTION,
 
     CONSTRAINT fk_votaciones_usuarios FOREIGN KEY (idUsuario)
         REFERENCES USUARIOS(idUsuario)
-		ON DELETE ACTION
-        ON UPDATE CASCADE
+        ON DELETE NO ACTION
 );
 
 CREATE TABLE PONENTES (
@@ -71,13 +66,11 @@ CREATE TABLE CHARLAPONENTES (
 
     CONSTRAINT fk_cp_charlas FOREIGN KEY (idCharla)
         REFERENCES CHARLAS(idCharla)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
+        ON DELETE CASCADE,
 
     CONSTRAINT fk_cp_ponentes FOREIGN KEY (idPonente)
         REFERENCES PONENTES(idPonente)
         ON DELETE CASCADE
-        ON UPDATE CASCADE
 );
 
 CREATE TABLE FECHAS (
@@ -90,5 +83,4 @@ CREATE TABLE FECHAS (
     CONSTRAINT fk_fechas_charlas FOREIGN KEY (idCharla)
         REFERENCES CHARLAS(idCharla)
         ON DELETE CASCADE
-        ON UPDATE CASCADE
 );
