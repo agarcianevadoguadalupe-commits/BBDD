@@ -1,3 +1,7 @@
+CREATE DATABASE Potencial_Digital_SQL;
+
+USE Potencial_Digital_SQL;
+
 CREATE TABLE CHARLAS (
     idCharla SMALLINT IDENTITY(1,1) NOT NULL,
     nombre VARCHAR(255) NOT NULL,
