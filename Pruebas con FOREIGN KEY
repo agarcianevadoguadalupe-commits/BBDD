@@ -40,7 +40,6 @@ CREATE TABLE COLEGIOS_ACTIVIDADES (
 );
 
 -- Insertar actividades de prueba
--- IMPORTANTE: Asegúrate de que existen charlas con idCharla = 1 y 2 en la tabla CHARLAS
 INSERT INTO COLEGIOS_ACTIVIDADES (idColegio, idCharla, fecha, numero_asistentes)
 VALUES
 (1, 1, '2025-05-10', 45),     -- Actividad con charla existente
