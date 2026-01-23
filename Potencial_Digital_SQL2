@@ -1,0 +1,84 @@
+CREATE DATABASE Potencial_Digital_SQL2;                    -- Creación de la base de datos
+GO
+
+USE Potencial_Digital_SQL2;                                -- Uso de la base de datos creada
+GO
+
+CREATE TABLE CHARLAS (
+    idCharla SMALLINT IDENTITY(1,1) NOT NULL,             -- Identificador único de la charla
+    nombre VARCHAR(255) NOT NULL,                          -- Nombre o título de la charla
+    informacion_add VARCHAR(MAX),                          -- Información adicional opcional
+    fecha DATETIME NOT NULL,                               -- Fecha y hora de la charla
+    suma_votos DECIMAL(4,2) DEFAULT 0,                     -- Suma total de votos
+    num_votantes SMALLINT DEFAULT 0,                       -- Número de votantes
+    puntuacion_media DECIMAL(4,2) DEFAULT 1,               -- Puntuación media por defecto
+
+    CONSTRAINT pk_charlas PRIMARY KEY (idCharla),          -- Clave primaria
+    CONSTRAINT chk_puntuacion CHECK                        -- Restricción de validación
+        (puntuacion_media BETWEEN 1 AND 10)
+);
+
+CREATE TABLE USUARIOS (
+    idUsuario SMALLINT IDENTITY(1,1) NOT NULL,             -- Identificador único del usuario
+    nombre VARCHAR(100) NOT NULL,                           -- Nombre del usuario
+    telefono CHAR(13) NOT NULL,                             -- Teléfono del usuario
+
+    CONSTRAINT pk_usuarios PRIMARY KEY (idUsuario),        -- Clave primaria
+    CONSTRAINT uq_telefono UNIQUE (telefono)               -- Teléfono único
+);
+
+CREATE TABLE ASISTENCIAS (
+    idCharla SMALLINT NOT NULL,                            -- Clave ajena a CHARLAS
+    idUsuario SMALLINT NOT NULL,                           -- Clave ajena a USUARIOS
+
+    CONSTRAINT pk_asistencias PRIMARY KEY                  -- Clave primaria compuesta
+        (idCharla, idUsuario),
+
+    CONSTRAINT fk_asistencias_charlas FOREIGN KEY          -- Relación con CHARLAS
+        (idCharla) REFERENCES CHARLAS(idCharla)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_asistencias_usuarios FOREIGN KEY         -- Relación con USUARIOS
+        (idUsuario) REFERENCES USUARIOS(idUsuario)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE VOTACIONES (
+    idCharla SMALLINT NOT NULL,                            -- Clave ajena a CHARLAS
+    idUsuario SMALLINT NOT NULL,                           -- Clave ajena a USUARIOS
+
+    CONSTRAINT pk_votaciones PRIMARY KEY                   -- Clave primaria compuesta
+        (idCharla, idUsuario),
+
+    CONSTRAINT fk_votaciones_charlas FOREIGN KEY           -- Relación con CHARLAS
+        (idCharla) REFERENCES CHARLAS(idCharla)
+        ON DELETE NO ACTION,
+
+    CONSTRAINT fk_votaciones_usuarios FOREIGN KEY          -- Relación con USUARIOS
+        (idUsuario) REFERENCES USUARIOS(idUsuario)
+        ON DELETE NO ACTION
+);
+
+CREATE TABLE PONENTES (
+    idPonente SMALLINT IDENTITY(1,1) NOT NULL,             -- Identificador del ponente
+    nombre VARCHAR(100) NOT NULL,                           -- Nombre del ponente
+    cobro DECIMAL(6,2) DEFAULT 0.00,                        -- Importe que cobra
+
+    CONSTRAINT pk_ponentes PRIMARY KEY (idPonente)         -- Clave primaria
+);
+
+CREATE TABLE CHARLAPONENTES (
+    idCharla SMALLINT NOT NULL,                            -- Clave ajena a CHARLAS
+    idPonente SMALLINT NOT NULL,                           -- Clave ajena a PONENTES
+
+    CONSTRAINT pk_charlaponentes PRIMARY KEY               -- Clave primaria compuesta
+        (idCharla, idPonente),
+
+    CONSTRAINT fk_cp_charlas FOREIGN KEY                   -- Relación con CHARLAS
+        (idCharla) REFERENCES CHARLAS(idCharla)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_cp_ponentes FOREIGN KEY                  -- Relación con PONENTES
+        (idPonente) REFERENCES PONENTES(idPonente)
+        ON DELETE CASCADE
+);
