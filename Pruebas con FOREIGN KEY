@@ -1,22 +1,22 @@
-USE Potencial_Digital_SQL2;
+USE Potencial_Digital_SQL;
 GO
 
 -- ============================================
 -- Tabla COLEGIOS
 -- ============================================
 CREATE TABLE COLEGIOS (
-    idColegio INT NOT NULL,  -- Identificador del colegio (NO autoincremental)
-    nombre VARCHAR(150) NOT NULL,  -- Nombre del colegio
-    persona_contacto VARCHAR(100) NOT NULL,  -- Persona de contacto
-    tfno_contacto VARCHAR(15) NOT NULL,      -- Teléfono de contacto
-    CONSTRAINT pk_colegios PRIMARY KEY (idColegio) -- Clave primaria
+    idColegio INT NOT NULL,                      -- Identificador del colegio (NO autoincremental)
+    nombre VARCHAR(150) NOT NULL,                -- Nombre del colegio
+    persona_contacto VARCHAR(100) NOT NULL,      -- Persona de contacto
+    tfno_contacto VARCHAR(15) NOT NULL,         -- Teléfono de contacto
+    CONSTRAINT pk_colegios PRIMARY KEY (idColegio)  -- Clave primaria
 );
 
--- Fila especial por defecto
+-- Insertar fila comodín
 INSERT INTO COLEGIOS VALUES
 (0, 'plazas disponibles', 'no procede', 'no procede');
 
--- Fila de prueba
+-- Insertar algunos colegios de prueba
 INSERT INTO COLEGIOS VALUES
 (1, 'IES Zurbarán', 'Juan Pérez', '600111222'),
 (2, 'Colegio Santa Ana', 'María López', '600333444');
@@ -25,23 +25,42 @@ INSERT INTO COLEGIOS VALUES
 -- Tabla COLEGIOS_ACTIVIDADES
 -- ============================================
 CREATE TABLE COLEGIOS_ACTIVIDADES (
-    idReserva SMALLINT IDENTITY(1,1) NOT NULL, -- Identificador de la reserva
-    idColegio INT NOT NULL DEFAULT 0,         -- Colegio (por defecto 0)
-    idCharla SMALLINT NULL,                    -- Charla asociada (puede ser NULL)
-    fecha DATETIME NOT NULL,                    -- Fecha de la actividad
-    numero_asistentes SMALLINT NOT NULL,       -- Número de asistentes
-    CONSTRAINT pk_colegios_actividades PRIMARY KEY (idReserva), -- Clave primaria
-    CONSTRAINT fk_ca_colegios FOREIGN KEY (idColegio)
+    idReserva SMALLINT IDENTITY(1,1) NOT NULL,    -- Identificador de la reserva
+    idColegio INT NOT NULL DEFAULT 0,             -- Colegio (por defecto 0)
+    idCharla SMALLINT NULL,                        -- Charla asociada (puede ser NULL)
+    fecha DATETIME NOT NULL,                        -- Fecha de la actividad
+    numero_asistentes SMALLINT NOT NULL,           -- Número de asistentes
+    CONSTRAINT pk_colegios_actividades PRIMARY KEY (idReserva),  -- Clave primaria
+    CONSTRAINT fk_ca_colegios FOREIGN KEY (idColegio)            -- Relación con colegios
         REFERENCES COLEGIOS(idColegio)
-        ON DELETE CASCADE,  -- Borra actividades si se borra el colegio
-    CONSTRAINT fk_ca_charlas FOREIGN KEY (idCharla)
+        ON DELETE CASCADE,                        -- Borra actividades si se borra colegio
+    CONSTRAINT fk_ca_charlas FOREIGN KEY (idCharla)              -- Relación con charlas
         REFERENCES CHARLAS(idCharla)
-        ON DELETE NO ACTION -- No permite borrar charla si está en actividades
+        ON DELETE NO ACTION                        -- No permite borrar charla con actividades
 );
 
 -- Insertar actividades de prueba
+-- IMPORTANTE: Asegúrate de que existen charlas con idCharla = 1 y 2 en la tabla CHARLAS
 INSERT INTO COLEGIOS_ACTIVIDADES (idColegio, idCharla, fecha, numero_asistentes)
 VALUES
-(1, 1, '2025-05-10', 45),
-(2, 1, '2025-05-12', 30),
-(1, NULL, '2025-06-01', 20);
+(1, 1, '2025-05-10', 45),     -- Actividad con charla existente
+(2, 2, '2025-05-12', 30),     -- Otra actividad con otra charla
+(1, NULL, '2025-06-01', 20);  -- Actividad sin charla asignada
+
+-- ============================================
+-- Tabla de pruebas de borrado
+-- ============================================
+CREATE TABLE PRUEBAS_BORRADO (
+    prueba VARCHAR(100) NOT NULL,       -- Descripción de la prueba
+    resultado VARCHAR(255) NOT NULL     -- Resultado esperado
+);
+
+-- Pruebas de borrado de colegios
+INSERT INTO PRUEBAS_BORRADO VALUES
+('Borrar colegio 1', 'Se borran automáticamente las actividades relacionadas (idReserva 1 y 3)'),
+('Borrar colegio 0', 'Se borran las actividades con idColegio = 0 si las hubiera');
+
+-- Pruebas de borrado de charlas
+INSERT INTO PRUEBAS_BORRADO VALUES
+('Borrar charla 1', 'NO se permite porque hay actividades relacionadas (ON DELETE NO ACTION)'),
+('Borrar charla 2', 'NO se permite porque hay actividades relacionadas (ON DELETE NO ACTION)');
